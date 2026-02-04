@@ -35,9 +35,7 @@ body {
   50% { transform: translateY(-6px); }
 }
 
-h1 {
-  color: #ff4b6e;
-}
+h1 { color: #ff4b6e; }
 
 p {
   color: #444;
@@ -47,8 +45,9 @@ p {
 .buttons {
   margin-top: 25px;
   display: flex;
-  justify-content: center;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
 }
 
 button {
@@ -73,7 +72,6 @@ button {
 #noBtn {
   background: #ddd;
   color: #555;
-  position: fixed; /* required for escape */
 }
 
 .hearts {
@@ -81,7 +79,7 @@ button {
   font-size: 20px;
   animation: fall 5s linear infinite;
   opacity: 0.8;
-  pointer-events: none; /* 🔥 allows clicking buttons */
+  pointer-events: none;
 }
 
 @keyframes fall {
@@ -120,12 +118,40 @@ button {
 <script>
 const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
-const card = document.getElementById("card");
 
-noBtn.addEventListener("mouseenter", moveNo);
-noBtn.addEventListener("touchstart", moveNo);
+let noCount = 0;
+const escapeAfter = 8;
+
+noBtn.addEventListener("click", () => {
+  noCount++;
+
+  if (noCount < escapeAfter) {
+    const messages = [
+      "No 😅",
+      "Are you sure? 🤨",
+      "Think again 😏",
+      "Hmm… 🤔",
+      "Really? 😬",
+      "Last chance 😳",
+      "Okay… 👀"
+    ];
+    noBtn.innerText = messages[noCount - 1] || "No 😅";
+  } else {
+    moveNo();
+  }
+});
+
+noBtn.addEventListener("mouseenter", () => {
+  if (noCount >= escapeAfter) moveNo();
+});
+
+noBtn.addEventListener("touchstart", () => {
+  if (noCount >= escapeAfter) moveNo();
+});
 
 function moveNo() {
+  noBtn.style.position = "fixed";
+
   const maxX = window.innerWidth - noBtn.offsetWidth;
   const maxY = window.innerHeight - noBtn.offsetHeight;
 
@@ -156,7 +182,7 @@ yesBtn.addEventListener("click", () => {
   `;
 });
 
-// Floating hearts
+// floating hearts
 setInterval(() => {
   const heart = document.createElement("div");
   heart.className = "hearts";
@@ -164,7 +190,6 @@ setInterval(() => {
   heart.style.left = Math.random() * 100 + "vw";
   heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
   document.body.appendChild(heart);
-
   setTimeout(() => heart.remove(), 5000);
 }, 500);
 </script>
