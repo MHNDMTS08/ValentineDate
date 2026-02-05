@@ -44,7 +44,6 @@ p { color: #444; }
   display: flex;
   justify-content: center;
   gap: 20px;
-  position: relative; /* parent for absolute positioning */
 }
 
 
@@ -65,11 +64,11 @@ button {
 }
 
 #noBtn {
-  position: fixed;
+  position: relative;      /* normal flow on load */
   background: #eee;
-  top: 0;
-  left: 120px; /* next to Yes button */
-  transition: top 0.2s ease, left 0.2s ease; /* smooth movement */
+  visibility: visible;
+  opacity: 1;
+  transition: left 0.2s ease, top 0.2s ease;
 }
 
 .hidden {
@@ -139,21 +138,45 @@ const yes = document.getElementById("yes");
 
 // counter to delay No button dodging
 let tries = 0;
+let noActivated = false; // becomes true when dodge starts
 const dodgeAfter = 1; // number of tries before dodging
+
+
 
 // move No button randomly inside the card
 function moveNo() {
-  const maxX = window.innerWidth - noBtn.offsetWidth;
-  const maxY = window.innerHeight - noBtn.offsetHeight;
+   // First activation: detach from layout safely
+  if (!noActivated) {
+    const rect = noBtn.getBoundingClientRect();
 
-  const x = Math.random() * maxX;
-  const y = Math.random() * maxY;
+    noBtn.style.position = "fixed";
+    noBtn.style.left = rect.left + "px";
+    noBtn.style.top = rect.top + "px";
+
+    noActivated = true;
+  }
+
+  const padding = 15;
+
+  const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+  const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
+  let x = Math.random() * maxX;
+  let y = Math.random() * maxY;
+
+  // clamp inside screen
+  x = Math.max(padding, Math.min(x, maxX));
+  y = Math.max(padding, Math.min(y, maxY));
 
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
 }
 
 // Desktop: move when cursor gets close
+
+
+
+
 document.addEventListener("mousemove", (e) => {
   const r = noBtn.getBoundingClientRect();
   const bx = r.left + r.width / 2;
